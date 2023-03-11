@@ -1,7 +1,10 @@
 package com.ghn.di
 
+import com.ghn.data.repository.follow.FollowRepository
+import com.ghn.data.repository.follow.FollowRepositoryImpl
 import com.ghn.data.repository.user.UserRepository
 import com.ghn.data.repository.user.UserRepositoryImpl
+import com.ghn.service.FollowService
 import com.ghn.service.UserService
 import com.ghn.util.Constants
 import com.google.gson.Gson
@@ -18,8 +21,15 @@ val mainModule = module {
     single<UserRepository> {
         UserRepositoryImpl(get())
     }
+    single<FollowRepository> {
+        FollowRepositoryImpl(get())
+    }
+
     single<UserService> {
-        UserService(get())
+        UserService(get(), get())
+    }
+    single<FollowService> {
+        FollowService(get())
     }
 
     single { Gson() }

@@ -1,11 +1,13 @@
 package com.ghn.service
 
 import com.ghn.data.models.User
+import com.ghn.data.repository.follow.FollowRepository
 import com.ghn.data.repository.user.UserRepository
 import com.ghn.data.requests.CreateAccountRequest
 
 class UserService(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val followRepository: FollowRepository
 ) {
 
     suspend fun doesUserWithEmailExist(email: String): Boolean {
@@ -17,18 +19,20 @@ class UserService(
     }
 
     suspend fun createUser(request: CreateAccountRequest) {
-        userRepository.createUser(User(
-            email = request.email,
-            username = request.username,
-            password = request.password,
-            profileImageUrl = "",
-            bannerUrl = "",
-            bio = ""
-        ))
+        userRepository.createUser(
+            User(
+                email = request.email,
+                username = request.username,
+                password = request.password,
+                profileImageUrl = "",
+                bannerUrl = "",
+                bio = ""
+            )
+        )
     }
 
     fun validateCreateAccountRequest(request: CreateAccountRequest): ValidationEvent {
-        if(request.email.isBlank() || request.username.isBlank() || request.password.isBlank()) {
+        if (request.email.isBlank() || request.username.isBlank() || request.password.isBlank()) {
             return ValidationEvent.ErrorFieldEmpty
         }
         return ValidationEvent.Success

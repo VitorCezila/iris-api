@@ -14,7 +14,7 @@ class UserRepositoryImpl(
     db: CoroutineDatabase
 ) : UserRepository {
 
-    private val users: CoroutineCollection<User> = db.getCollection<User>()
+    private val users = db.getCollection<User>()
 
     override suspend fun createUser(user: User) {
         users.insertOne(user)
