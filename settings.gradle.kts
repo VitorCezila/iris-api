@@ -1,1 +1,1 @@
-rootProject.name = "com.ghn.iris-api"
+rootProject.name = "iris-api"

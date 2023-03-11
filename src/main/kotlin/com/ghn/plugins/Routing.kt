@@ -1,19 +1,19 @@
 package com.ghn.plugins
 
-import io.ktor.server.routing.*
-import io.ktor.server.response.*
-import io.ktor.server.http.content.*
+import com.ghn.routes.authenticate
+import com.ghn.routes.createUser
+import com.ghn.routes.loginUser
+import com.ghn.service.UserService
 import io.ktor.server.application.*
+import io.ktor.server.routing.*
+import org.koin.ktor.ext.inject
 
 fun Application.configureRouting() {
-    
+    val userService: UserService by inject()
+
     routing {
-        get("/") {
-            call.respondText("Hello World!")
-        }
-        // Static plugin. Try to access `/static/index.html`
-        static("/static") {
-            resources("static")
-        }
+        // User routes
+        authenticate()
+        createUser(userService = userService)
     }
 }

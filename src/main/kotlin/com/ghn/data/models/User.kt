@@ -10,5 +10,9 @@ data class User(
     val username: String,
     val password: String,
     val profileImageUrl: String,
-    val bio: String
+    val bannerUrl: String?,
+    val bio: String,
+    val followerCount: Int = 0,
+    val followingCount: Int = 0,
+    val postCount: Int = 0
 )
