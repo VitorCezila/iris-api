@@ -9,6 +9,7 @@ import com.google.gson.Gson
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -18,51 +19,53 @@ import java.io.File
 fun Route.createPost(postService: PostService) {
     val gson by inject<Gson>()
 
-    post("/post/create") {
-        val multipart = call.receiveMultipart()
-        var createPostRequest: CreatePostRequest? = null
-        var fileName: String? = null
-        multipart.forEachPart { partData ->
-            when (partData) {
-                is PartData.FormItem -> {
-                    if (partData.name == "post_data") {
-                        createPostRequest = gson.fromJson(
-                            partData.value,
-                            CreatePostRequest::class.java
-                        )
+    authenticate {
+        post("/post/create") {
+            val multipart = call.receiveMultipart()
+            var createPostRequest: CreatePostRequest? = null
+            var fileName: String? = null
+            multipart.forEachPart { partData ->
+                when (partData) {
+                    is PartData.FormItem -> {
+                        if (partData.name == "post_data") {
+                            createPostRequest = gson.fromJson(
+                                partData.value,
+                                CreatePostRequest::class.java
+                            )
+                        }
                     }
+                    is PartData.FileItem -> {
+                        fileName = partData.save("")
+                    }
+                    is PartData.BinaryItem -> Unit
+                    is PartData.BinaryChannelItem -> Unit
                 }
-                is PartData.FileItem -> {
-                    fileName = partData.save("")
-                }
-                is PartData.BinaryItem -> Unit
-                is PartData.BinaryChannelItem -> Unit
             }
-        }
 
-        val postPictureUrl = "${Constants.BASE_URL}post_pictures/$fileName"
+            val postPictureUrl = "${Constants.BASE_URL}post_pictures/$fileName"
 
-        createPostRequest?.let { request ->
-            val createPostAcknowledged = postService.createPost(
-                request = request,
-                userId = "1",
-                imageUrl = postPictureUrl
-            )
-            if (createPostAcknowledged) {
-                call.respond(
-                    HttpStatusCode.OK,
-                    BasicApiResponse<Unit>(
-                        successful = true
-                    )
+            createPostRequest?.let { request ->
+                val createPostAcknowledged = postService.createPost(
+                    request = request,
+                    userId = call.userId,
+                    imageUrl = postPictureUrl
                 )
-            } else {
-                File("${Constants.POST_PICTURE_PATH}/$fileName").delete()
-                call.respond(HttpStatusCode.InternalServerError)
+                if (createPostAcknowledged) {
+                    call.respond(
+                        HttpStatusCode.OK,
+                        BasicApiResponse<Unit>(
+                            successful = true
+                        )
+                    )
+                } else {
+                    File("${Constants.POST_PICTURE_PATH}/$fileName").delete()
+                    call.respond(HttpStatusCode.InternalServerError)
+                }
+            } ?: kotlin.run {
+                call.respond(HttpStatusCode.BadRequest)
+                return@post
             }
-        } ?: kotlin.run {
-            call.respond(HttpStatusCode.BadRequest)
-            return@post
-        }
 
+        }
     }
 }

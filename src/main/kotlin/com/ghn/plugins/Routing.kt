@@ -25,12 +25,18 @@ fun Application.configureRouting() {
             userService = userService,
             jwtIssuer = jwtIssuer,
             jwtAudience = jwtAudience,
-            jwtSecret = jwtSecret)
+            jwtSecret = jwtSecret
+        )
+        searchUser(userService = userService)
+        getUserProfile(userService = userService)
+        updateUserProfile(userService = userService)
 
         // Following routes
         followUser(followService = followService)
+        unfollowUser(followService = followService)
 
         //post
         createPost(postService = postService)
+
     }
 }
