@@ -9,5 +9,7 @@ data class Post(
     val content: String,
     val imageUrl: String,
     val userId: String,
-    val timestamp: Long
+    val timestamp: Long,
+    val likeCount: Int = 0,
+    val commentCount: Int = 0
 )
