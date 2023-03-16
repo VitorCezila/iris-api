@@ -143,7 +143,7 @@ fun Route.deletePost(
 fun Route.getPostDetails(postService: PostService) {
     get("/post/details") {
         val postId = call.parameters[QueryParams.PARAM_POST_ID] ?: kotlin.run {
-            call.respond(HttpStatusCode.OK)
+            call.respond(HttpStatusCode.NotFound)
             return@get
         }
         val post = postService.getPostDetails(call.userId, postId) ?: kotlin.run {
