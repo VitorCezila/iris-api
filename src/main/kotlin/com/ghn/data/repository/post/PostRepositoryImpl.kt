@@ -1,10 +1,12 @@
 package com.ghn.data.repository.post
 
 import com.ghn.data.models.Following
+import com.ghn.data.models.Like
 import com.ghn.data.models.Post
 import com.ghn.data.models.User
 import com.ghn.data.responses.PostResponse
 import org.litote.kmongo.`in`
+import org.litote.kmongo.and
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.eq
 import org.litote.kmongo.inc
@@ -16,6 +18,7 @@ class PostRepositoryImpl(
     private val posts = db.getCollection<Post>()
     private val following = db.getCollection<Following>()
     private val users = db.getCollection<User>()
+    private val likes = db.getCollection<Like>()
 
     override suspend fun createPost(post: Post): Boolean {
         return posts.insertOne(post).wasAcknowledged().also { wasAcknowledged ->
@@ -54,6 +57,10 @@ class PostRepositoryImpl(
             .descendingSort(Post::timestamp)
             .toList()
             .map { post ->
+                val isLiked = likes.findOne(and(
+                    Like::parentId eq post.id,
+                    Like::userId eq ownUserId
+                )) != null
                 val user = users.findOneById(post.userId)
                 PostResponse(
                     id = post.id,
@@ -64,7 +71,7 @@ class PostRepositoryImpl(
                     description = post.content,
                     likeCount = post.likeCount,
                     commentCount = post.commentCount,
-                    isLiked = true,
+                    isLiked = isLiked,
                     isOwnPost = ownUserId == post.userId
                 )
             }
@@ -83,6 +90,11 @@ class PostRepositoryImpl(
             .descendingSort(Post::timestamp)
             .toList()
             .map { post ->
+                val isLiked = likes.findOne(
+                    and(
+                    Like::parentId eq post.id,
+                    Like::userId eq ownUserId
+                )) != null
                 PostResponse(
                     id = post.id,
                     userId = userId,
@@ -92,7 +104,7 @@ class PostRepositoryImpl(
                     description = post.content,
                     likeCount = post.likeCount,
                     commentCount = post.commentCount,
-                    isLiked = true,
+                    isLiked = isLiked,
                     isOwnPost = ownUserId == post.userId
                 )
             }
@@ -103,6 +115,7 @@ class PostRepositoryImpl(
     }
 
     override suspend fun getPostDetails(userId: String, postId: String): PostResponse? {
+        val isLiked = likes.findOne(Like::userId eq userId) != null
         val post = posts.findOneById(postId) ?: return null
         val user = users.findOneById(post.userId) ?: return null
         return PostResponse(
@@ -114,7 +127,7 @@ class PostRepositoryImpl(
             description = post.content,
             likeCount = post.likeCount,
             commentCount = post.commentCount,
-            isLiked = true,
+            isLiked = isLiked,
             isOwnPost = userId == post.userId
         )
     }

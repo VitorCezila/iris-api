@@ -77,7 +77,7 @@ fun Route.getPostForProfile(
     postService: PostService
 ) {
     authenticate {
-        get("/user/posts") {
+        get("/user/post") {
             val userId = call.parameters[QueryParams.PARAM_USER_ID]
             val page = call.parameters[QueryParams.PARAM_PAGE]?.toIntOrNull() ?: 0
             val pageSize = call.parameters[QueryParams.PARAM_PAGE_SIZE]?.toIntOrNull() ?: Constants.DEFAULT_PAGE_SIZE
@@ -118,7 +118,7 @@ fun Route.deletePost(
     commentService: CommentService
 ) {
     authenticate {
-        delete("/post/delte") {
+        delete("/post/delete") {
             val postId = call.parameters[QueryParams.PARAM_POST_ID] ?: kotlin.run {
                 call.respond(HttpStatusCode.OK)
                 return@delete
