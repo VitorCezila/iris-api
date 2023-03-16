@@ -1,14 +1,17 @@
 package com.ghn.di
 
+import com.ghn.data.repository.comment.CommentRepository
+import com.ghn.data.repository.comment.CommentRepositoryImpl
 import com.ghn.data.repository.follow.FollowRepository
 import com.ghn.data.repository.follow.FollowRepositoryImpl
+import com.ghn.data.repository.likes.LikeRepository
+import com.ghn.data.repository.likes.LikeRepositoryImpl
 import com.ghn.data.repository.post.PostRepository
 import com.ghn.data.repository.post.PostRepositoryImpl
 import com.ghn.data.repository.user.UserRepository
 import com.ghn.data.repository.user.UserRepositoryImpl
-import com.ghn.service.FollowService
-import com.ghn.service.PostService
-import com.ghn.service.UserService
+import com.ghn.data.responses.CommentResponse
+import com.ghn.service.*
 import com.ghn.util.Constants
 import com.google.gson.Gson
 import org.koin.dsl.module
@@ -30,6 +33,12 @@ val mainModule = module {
     single<PostRepository> {
         PostRepositoryImpl(get())
     }
+    single<LikeRepository> {
+        LikeRepositoryImpl(get())
+    }
+    single<CommentRepository> {
+        CommentRepositoryImpl(get())
+    }
 
     single<UserService> {
         UserService(get(), get())
@@ -39,6 +48,12 @@ val mainModule = module {
     }
     single<PostService> {
         PostService(get())
+    }
+    single<CommentService> {
+        CommentService(get(), get())
+    }
+    single<LikeService> {
+        LikeService(get(), get(), get())
     }
 
     single { Gson() }
