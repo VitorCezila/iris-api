@@ -2,7 +2,9 @@ package com.ghn.routes
 
 import com.ghn.data.requests.LikeUpdateRequest
 import com.ghn.data.responses.BasicApiResponse
+import com.ghn.data.util.ParentType
 import com.ghn.service.LikeService
+import com.ghn.service.NotificationService
 import com.ghn.util.ApiResponseMessages
 import com.ghn.util.QueryParams
 import io.ktor.http.*
@@ -13,7 +15,8 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
 fun Route.likeParent(
-    likeService: LikeService
+    likeService: LikeService,
+    notificationService: NotificationService
 ) {
     authenticate {
         post("/like") {
@@ -24,6 +27,11 @@ fun Route.likeParent(
             val userId = call.userId
             val likeSuccessful = likeService.likeParent(userId, request.parentId, request.parentType)
             if (likeSuccessful) {
+                notificationService.addLikeNotification(
+                    byUserId = userId,
+                    parentType = ParentType.fromType(request.parentType),
+                    parentId = request.parentId
+                )
                 call.respond(
                     HttpStatusCode.OK,
                     BasicApiResponse<Unit>(successful = true)

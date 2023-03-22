@@ -5,6 +5,7 @@ import com.ghn.data.requests.DeleteCommentRequest
 import com.ghn.data.responses.BasicApiResponse
 import com.ghn.service.CommentService
 import com.ghn.service.LikeService
+import com.ghn.service.NotificationService
 import com.ghn.util.ApiResponseMessages
 import com.ghn.util.QueryParams
 import io.ktor.http.*
@@ -15,7 +16,8 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
 fun Route.createComment(
-    commentService: CommentService
+    commentService: CommentService,
+    notificationService: NotificationService
 ) {
     authenticate {
         post("/comment/create") {
@@ -53,6 +55,10 @@ fun Route.createComment(
                     )
                 }
                 is CommentService.ValidationEvent.Success -> {
+                    notificationService.addCommentNotification(
+                        byUserId = userId,
+                        postId = request.postId
+                    )
                     call.respond(
                         HttpStatusCode.OK,
                         BasicApiResponse<Unit>(

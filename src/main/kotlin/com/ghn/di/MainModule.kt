@@ -6,11 +6,12 @@ import com.ghn.data.repository.follow.FollowRepository
 import com.ghn.data.repository.follow.FollowRepositoryImpl
 import com.ghn.data.repository.likes.LikeRepository
 import com.ghn.data.repository.likes.LikeRepositoryImpl
+import com.ghn.data.repository.notification.NotificationRepository
+import com.ghn.data.repository.notification.NotificationRepositoryImpl
 import com.ghn.data.repository.post.PostRepository
 import com.ghn.data.repository.post.PostRepositoryImpl
 import com.ghn.data.repository.user.UserRepository
 import com.ghn.data.repository.user.UserRepositoryImpl
-import com.ghn.data.responses.CommentResponse
 import com.ghn.service.*
 import com.ghn.util.Constants
 import com.google.gson.Gson
@@ -39,6 +40,9 @@ val mainModule = module {
     single<CommentRepository> {
         CommentRepositoryImpl(get())
     }
+    single<NotificationRepository> {
+        NotificationRepositoryImpl(get())
+    }
 
     single<UserService> {
         UserService(get(), get())
@@ -54,6 +58,9 @@ val mainModule = module {
     }
     single<LikeService> {
         LikeService(get(), get(), get())
+    }
+    single<NotificationService> {
+        NotificationService(get(), get(), get())
     }
 
     single { Gson() }

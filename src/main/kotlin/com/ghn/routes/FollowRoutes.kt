@@ -1,8 +1,11 @@
 package com.ghn.routes
 
+import com.ghn.data.models.Notification
 import com.ghn.data.requests.FollowUpdateRequest
 import com.ghn.data.responses.BasicApiResponse
+import com.ghn.data.util.NotificationType
 import com.ghn.service.FollowService
+import com.ghn.service.NotificationService
 import com.ghn.util.ApiResponseMessages.USER_NOT_FOUND
 import com.ghn.util.QueryParams
 import io.ktor.http.*
@@ -12,7 +15,10 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
-fun Route.followUser(followService: FollowService) {
+fun Route.followUser(
+    followService: FollowService,
+    notificationService: NotificationService
+) {
     authenticate {
         post("/following/follow") {
             val request = call.receiveOrNull<FollowUpdateRequest>() ?: kotlin.run {
@@ -21,6 +27,15 @@ fun Route.followUser(followService: FollowService) {
             }
             val didUserExist = followService.followUserIfExists(request, call.userId)
             if (didUserExist) {
+                notificationService.createNotification(
+                    Notification(
+                        timestamp = System.currentTimeMillis(),
+                        byUserId = call.userId,
+                        toUserId = request.followedUserId,
+                        type = NotificationType.FollowedUser.type,
+                        parentId = ""
+                    )
+                )
                 call.respond(
                     HttpStatusCode.OK,
                     BasicApiResponse<Unit>(
