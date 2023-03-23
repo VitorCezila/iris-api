@@ -3,6 +3,7 @@ package com.ghn.plugins
 import com.ghn.routes.*
 import com.ghn.service.*
 import io.ktor.server.application.*
+import io.ktor.server.http.content.*
 import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
 
@@ -61,5 +62,9 @@ fun Application.configureRouting() {
 
         // Notification routes
         getNotifications(notificationService = notificationService)
+
+        static {
+            resources("static")
+        }
     }
 }

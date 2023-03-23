@@ -7,6 +7,7 @@ import com.ghn.data.requests.CreateAccountRequest
 import com.ghn.data.requests.UpdateProfileRequest
 import com.ghn.data.responses.ProfileResponse
 import com.ghn.data.responses.UserResponseItem
+import com.ghn.util.Constants
 
 class UserService(
     private val userRepository: UserRepository,
@@ -56,8 +57,8 @@ class UserService(
                 email = request.email,
                 username = request.username,
                 password = request.password,
-                profileImageUrl = "",
-                bannerUrl = "",
+                profileImageUrl = Constants.DEFAULT_PROFILE_PICTURE_PATH,
+                bannerUrl = Constants.DEFAULT_BANNER_IMAGE_PATH,
                 bio = ""
             )
         )

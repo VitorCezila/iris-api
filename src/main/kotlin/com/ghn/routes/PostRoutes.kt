@@ -38,7 +38,7 @@ fun Route.createPost(postService: PostService) {
                         }
                     }
                     is PartData.FileItem -> {
-                        fileName = partData.save("")
+                        fileName = partData.save(Constants.POST_PICTURE_PATH)
                     }
                     is PartData.BinaryItem -> Unit
                     is PartData.BinaryChannelItem -> Unit
