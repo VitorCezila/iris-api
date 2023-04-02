@@ -6,7 +6,6 @@ import com.ghn.data.responses.UserResponseItem
 import com.ghn.service.UserService
 import com.ghn.util.ApiResponseMessages
 import com.ghn.util.Constants.BANNER_IMAGE_PATH
-import com.ghn.util.Constants.BASE_URL
 import com.ghn.util.Constants.PROFILE_PICTURE_PATH
 import com.ghn.util.QueryParams
 import com.ghn.util.save
@@ -101,8 +100,8 @@ fun Route.updateUserProfile(userService: UserService) {
                 }
             }
 
-            val profilePictureUrl = "${BASE_URL}profile_pictures/$profilePictureFileName"
-            val bannerImageUrl = "${BASE_URL}banner_images/$bannerImageFileName"
+            val profilePictureUrl = "${System.getenv("BASE_URL")}/profile_pictures/$profilePictureFileName"
+            val bannerImageUrl = "${System.getenv("BASE_URL")}/banner_images/$bannerImageFileName"
 
             updateProfileRequest?.let { request ->
                 val updateAcknowledged = userService.updateUser(

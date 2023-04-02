@@ -45,7 +45,7 @@ fun Route.createPost(postService: PostService) {
                 }
             }
 
-            val postPictureUrl = "${Constants.BASE_URL}post_pictures/$fileName"
+            val postPictureUrl = "${System.getenv("BASE_URL")}/post_pictures/$fileName"
 
             createPostRequest?.let { request ->
                 val createPostAcknowledged = postService.createPost(

@@ -57,8 +57,8 @@ class UserService(
                 email = request.email,
                 username = request.username,
                 password = request.password,
-                profileImageUrl = Constants.DEFAULT_PROFILE_PICTURE_PATH,
-                bannerUrl = Constants.DEFAULT_BANNER_IMAGE_PATH,
+                profileImageUrl = "${System.getenv("BASE_URL")}/${Constants.DEFAULT_PROFILE_PICTURE_PATH}",
+                bannerUrl = "${System.getenv("BASE_URL")}/${Constants.DEFAULT_BANNER_IMAGE_PATH}",
                 bio = ""
             )
         )
