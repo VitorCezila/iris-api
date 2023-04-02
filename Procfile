@@ -1,1 +1,1 @@
-web: ./build/install/ktor-get-started-sample/bin/iris-api
+web: ./build/install/iris-api/bin/iris-api
