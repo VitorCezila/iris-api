@@ -9,10 +9,10 @@ import com.ghn.util.Constants
 class PostService(
     private val repository: PostRepository
 ) {
-    suspend fun createPost(request: CreatePostRequest, userId: String, imageUrl: String): Boolean {
+    suspend fun createPost(request: CreatePostRequest, userId: String, imageBase64: String): Boolean {
         return repository.createPost(
             Post(
-                imageUrl = imageUrl,
+                imageBase64 = imageBase64,
                 userId = userId,
                 timestamp = System.currentTimeMillis(),
                 content = request.content

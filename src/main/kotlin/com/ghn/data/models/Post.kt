@@ -7,7 +7,7 @@ data class Post(
     @BsonId
     val id: String = ObjectId().toString(),
     val content: String,
-    val imageUrl: String,
+    val imageBase64: String,
     val userId: String,
     val timestamp: Long,
     val likeCount: Int = 0,

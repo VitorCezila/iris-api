@@ -13,3 +13,8 @@ fun PartData.FileItem.save(path: String): String {
     File("$path$fileName").writeBytes(fileBytes)
     return fileName
 }
+
+fun PartData.FileItem.convertToBase64(): String {
+    val fileBytes = streamProvider().readBytes()
+    return Base64.getEncoder().encodeToString(fileBytes)
+}
