@@ -46,7 +46,7 @@ class CommentRepositoryImpl(
             CommentResponse(
                 id = comment.id,
                 username = comment.username,
-                profilePictureUrl = comment.profileImageUrl,
+                profilePictureBase64 = comment.profilePictureBase64,
                 timestamp = comment.timestamp,
                 content = comment.content,
                 isLiked = isLiked,

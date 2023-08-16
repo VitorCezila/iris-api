@@ -2,12 +2,13 @@ package com.ghn.data.repository.user
 
 import com.ghn.data.models.User
 import com.ghn.data.requests.UpdateProfileRequest
-import org.litote.kmongo.`in`
-import org.litote.kmongo.or
-import org.litote.kmongo.coroutine.CoroutineCollection
+import com.ghn.util.Constants
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.eq
+import org.litote.kmongo.`in`
+import org.litote.kmongo.or
 import org.litote.kmongo.regex
+import java.util.*
 
 
 class UserRepositoryImpl(
@@ -17,7 +18,18 @@ class UserRepositoryImpl(
     private val users = db.getCollection<User>()
 
     override suspend fun createUser(user: User) {
-        users.insertOne(user)
+        val profileDefaultPicture = javaClass.classLoader.getResource(Constants.DEFAULT_PROFILE_PICTURE_PATH).readBytes()
+        val profileDefaultPictureBase64 = Base64.getEncoder().encodeToString(profileDefaultPicture)
+
+        val profileDefaultBanner = javaClass.classLoader.getResource(Constants.DEFAULT_BANNER_IMAGE_PATH).readBytes()
+        val profileDefaultBannerBase64 = Base64.getEncoder().encodeToString(profileDefaultBanner)
+
+        val newUser = user.copy(
+            profilePictureBase64 = profileDefaultPictureBase64,
+            profileBannerBase64 = profileDefaultBannerBase64,
+        )
+
+        users.insertOne(newUser)
     }
 
     override suspend fun getUserById(id: String): User? {
@@ -30,8 +42,8 @@ class UserRepositoryImpl(
 
     override suspend fun updateUser(
         userId: String,
-        profileImageUrl: String?,
-        bannerUrl: String?,
+        profilePictureBase64: String?,
+        profileBannerBase64: String?,
         updateProfileRequest: UpdateProfileRequest
     ): Boolean {
         val user = getUserById(userId) ?: return false
@@ -42,8 +54,8 @@ class UserRepositoryImpl(
                 email = user.email,
                 username = updateProfileRequest.username,
                 password = user.password,
-                profileImageUrl = profileImageUrl ?: user.profileImageUrl,
-                bannerUrl = bannerUrl ?: user.bannerUrl,
+                profilePictureBase64 = profilePictureBase64 ?: user.profilePictureBase64,
+                profileBannerBase64 = profileBannerBase64 ?: user.profileBannerBase64,
                 bio = updateProfileRequest.bio,
                 followerCount = user.followerCount,
                 followingCount = user.followingCount,

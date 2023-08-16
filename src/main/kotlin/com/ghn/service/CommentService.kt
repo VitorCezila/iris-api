@@ -25,7 +25,7 @@ class CommentService(
         commentRepository.createComment(
             Comment(
                 username = user.username,
-                profileImageUrl = user.profileImageUrl,
+                profilePictureBase64 = user.profilePictureBase64,
                 likeCount = 0,
                 content = createCommentRequest.content,
                 userId = userId,

@@ -7,7 +7,6 @@ import com.ghn.data.requests.CreateAccountRequest
 import com.ghn.data.requests.UpdateProfileRequest
 import com.ghn.data.responses.ProfileResponse
 import com.ghn.data.responses.UserResponseItem
-import com.ghn.util.Constants
 
 class UserService(
     private val userRepository: UserRepository,
@@ -27,8 +26,8 @@ class UserService(
             followerCount = user.followerCount,
             followingCount = user.followingCount,
             postCount = user.postCount,
-            profilePictureUrl = user.profileImageUrl,
-            bannerUrl = user.bannerUrl,
+            profilePictureBase64 = user.profilePictureBase64,
+            profileBannerBase64 = user.profileBannerBase64,
             isOwnProfile = userId == callerUserId,
             isFollowing = if (userId != callerUserId) {
                 followRepository.doesUserFollow(callerUserId, userId)
@@ -44,11 +43,11 @@ class UserService(
 
     suspend fun updateUser(
         userId: String,
-        profileImageUrl: String?,
-        bannerUrl: String?,
+        profilePictureBase64: String?,
+        profileBannerBase64: String?,
         updateProfileRequest: UpdateProfileRequest
     ): Boolean {
-        return userRepository.updateUser(userId, profileImageUrl, bannerUrl, updateProfileRequest)
+        return userRepository.updateUser(userId, profilePictureBase64, profileBannerBase64, updateProfileRequest)
     }
 
     suspend fun createUser(request: CreateAccountRequest) {
@@ -57,8 +56,8 @@ class UserService(
                 email = request.email,
                 username = request.username,
                 password = request.password,
-                profileImageUrl = "${System.getenv("BASE_URL")}/${Constants.DEFAULT_PROFILE_PICTURE_PATH}",
-                bannerUrl = "${System.getenv("BASE_URL")}/${Constants.DEFAULT_BANNER_IMAGE_PATH}",
+                profilePictureBase64 = "",
+                profileBannerBase64 = "",
                 bio = ""
             )
         )
@@ -72,7 +71,7 @@ class UserService(
             UserResponseItem(
                 userId = user.id,
                 username = user.username,
-                profilePictureUrl = user.profileImageUrl,
+                profilePictureBase64 = user.profilePictureBase64,
                 bio = user.bio,
                 isFollowing = isFollowing
             )

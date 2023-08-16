@@ -32,7 +32,7 @@ class LikeService(
             UserResponseItem(
                 userId = user.id,
                 username = user.username,
-                profilePictureUrl = user.profileImageUrl,
+                profilePictureBase64 = user.profilePictureBase64,
                 bio = user.bio,
                 isFollowing = isFollowing
             )

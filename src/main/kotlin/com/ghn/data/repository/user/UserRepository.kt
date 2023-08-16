@@ -13,8 +13,8 @@ interface UserRepository {
 
     suspend fun updateUser(
         userId: String,
-        profileImageUrl: String?,
-        bannerUrl: String?,
+        profilePictureBase64: String?,
+        profileBannerBase64: String?,
         updateProfileRequest: UpdateProfileRequest
     ): Boolean
 

@@ -8,7 +8,7 @@ data class Comment(
     val id: String = ObjectId().toString(),
     val content: String,
     val username: String,
-    val profileImageUrl: String,
+    val profilePictureBase64: String,
     val userId: String,
     val postId: String,
     val timestamp: Long,
