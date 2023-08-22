@@ -51,7 +51,10 @@ class PostRepositoryImpl(
             .map {
                 it.followedUserId
             }
-        return posts.find(Post::userId `in` userIdsFromFollows)
+
+        val allUserIds = userIdsFromFollows + ownUserId
+        
+        return posts.find(Post::userId `in` allUserIds)
             .skip(page * pageSize)
             .limit(pageSize)
             .descendingSort(Post::timestamp)
