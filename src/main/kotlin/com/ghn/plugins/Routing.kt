@@ -59,6 +59,7 @@ fun Application.configureRouting() {
             commentService = commentService,
             likeService = likeService
         )
+        getCommentsForPost(commentService = commentService)
 
         // Notification routes
         getNotifications(notificationService = notificationService)
