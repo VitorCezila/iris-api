@@ -67,7 +67,7 @@ class PostRepositoryImpl(
                 val user = users.findOneById(post.userId)
                 PostResponse(
                     id = post.id,
-                    userId = ownUserId,
+                    userId = post.userId,
                     username = user?.username ?: "",
                     imageBase64 = post.imageBase64,
                     timestamp = post.timestamp,
