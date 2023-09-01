@@ -24,15 +24,19 @@ class NotificationRepositoryImpl(
             .limit(pageSize)
             .descendingSort(Notification::timestamp)
             .toList()
-        val userIds = notifications.map { it.byUserId }
+        val userIds = notifications.map { it.byUserId }.distinct()
+
+        // Fetch corresponding users
         val users = users.find(User::id `in` userIds).toList()
-        return notifications.mapIndexed { i, notification ->
+        val userMap = users.associateBy { it.id }
+        return notifications.map { notification ->
+            val user = userMap[notification.byUserId]
             NotificationResponse(
                 timestamp = notification.timestamp,
                 userId = notification.byUserId,
                 parentId = notification.parentId,
                 type = notification.type,
-                username = users[i].username,
+                username = user?.username ?: "Unknown User",
                 id = notification.id
             )
         }
