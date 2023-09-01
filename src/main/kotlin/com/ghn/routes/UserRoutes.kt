@@ -5,10 +5,8 @@ import com.ghn.data.responses.BasicApiResponse
 import com.ghn.data.responses.UserResponseItem
 import com.ghn.service.UserService
 import com.ghn.util.ApiResponseMessages
-import com.ghn.util.Constants.BANNER_IMAGE_PATH
-import com.ghn.util.Constants.PROFILE_PICTURE_PATH
 import com.ghn.util.QueryParams
-import com.ghn.util.save
+import com.ghn.util.convertToBase64
 import com.google.gson.Gson
 import io.ktor.http.*
 import io.ktor.http.content.*
@@ -18,7 +16,6 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
-import java.io.File
 
 fun Route.searchUser(userService: UserService) {
     authenticate {
@@ -44,7 +41,7 @@ fun Route.getUserProfile(userService: UserService) {
     authenticate {
         get("user/profile") {
             val userId = call.parameters[QueryParams.PARAM_USER_ID]
-            if (userId == null || userId.isBlank()) {
+            if (userId.isNullOrBlank()) {
                 call.respond(HttpStatusCode.BadRequest)
                 return@get
             }
@@ -76,8 +73,10 @@ fun Route.updateUserProfile(userService: UserService) {
         put("/user/update") {
             val multipart = call.receiveMultipart()
             var updateProfileRequest: UpdateProfileRequest? = null
-            var profilePictureFileName: String? = null
-            var bannerImageFileName: String? = null
+
+            var profilePictureBase64: String? = null
+            var profileBannerBase64: String? = null
+
             multipart.forEachPart { partData ->
                 when (partData) {
                     is PartData.FormItem -> {
@@ -90,9 +89,9 @@ fun Route.updateUserProfile(userService: UserService) {
                     }
                     is PartData.FileItem -> {
                         if (partData.name == "profile_picture") {
-                            profilePictureFileName = partData.save(PROFILE_PICTURE_PATH)
+                            profilePictureBase64 = partData.convertToBase64()
                         } else if (partData.name == "banner_image") {
-                            bannerImageFileName = partData.save(BANNER_IMAGE_PATH)
+                            profileBannerBase64 = partData.convertToBase64()
                         }
                     }
                     is PartData.BinaryItem -> Unit
@@ -100,22 +99,11 @@ fun Route.updateUserProfile(userService: UserService) {
                 }
             }
 
-            val profilePictureUrl = "${System.getenv("BASE_URL")}/profile_pictures/$profilePictureFileName"
-            val bannerImageUrl = "${System.getenv("BASE_URL")}/banner_images/$bannerImageFileName"
-
             updateProfileRequest?.let { request ->
                 val updateAcknowledged = userService.updateUser(
                     userId = call.userId,
-                    profileImageUrl = if (profilePictureFileName == null) {
-                        null
-                    } else {
-                        profilePictureUrl
-                    },
-                    bannerUrl = if (bannerImageFileName == null) {
-                        null
-                    } else {
-                        bannerImageUrl
-                    },
+                    profilePictureBase64 = profilePictureBase64,
+                    profileBannerBase64 = profileBannerBase64,
                     updateProfileRequest = request
                 )
                 if (updateAcknowledged) {
@@ -126,7 +114,6 @@ fun Route.updateUserProfile(userService: UserService) {
                         )
                     )
                 } else {
-                    File("${PROFILE_PICTURE_PATH}/$profilePictureFileName").delete()
                     call.respond(HttpStatusCode.InternalServerError)
                 }
             } ?: kotlin.run {

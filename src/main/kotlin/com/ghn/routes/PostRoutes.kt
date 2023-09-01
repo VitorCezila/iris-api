@@ -7,7 +7,7 @@ import com.ghn.service.LikeService
 import com.ghn.service.PostService
 import com.ghn.util.Constants
 import com.ghn.util.QueryParams
-import com.ghn.util.save
+import com.ghn.util.convertToBase64
 import com.google.gson.Gson
 import io.ktor.http.*
 import io.ktor.http.content.*
@@ -17,8 +17,6 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
-import java.io.File
-import javax.management.Query
 
 fun Route.createPost(postService: PostService) {
     val gson by inject<Gson>()
@@ -26,7 +24,7 @@ fun Route.createPost(postService: PostService) {
         post("/post/create") {
             val multipart = call.receiveMultipart()
             var createPostRequest: CreatePostRequest? = null
-            var fileName: String? = null
+            var postImage: String? = null
             multipart.forEachPart { partData ->
                 when (partData) {
                     is PartData.FormItem -> {
@@ -38,20 +36,18 @@ fun Route.createPost(postService: PostService) {
                         }
                     }
                     is PartData.FileItem -> {
-                        fileName = partData.save(Constants.POST_PICTURE_PATH)
+                        postImage = partData.convertToBase64()
                     }
                     is PartData.BinaryItem -> Unit
                     is PartData.BinaryChannelItem -> Unit
                 }
             }
 
-            val postPictureUrl = "${System.getenv("BASE_URL")}/post_pictures/$fileName"
-
             createPostRequest?.let { request ->
                 val createPostAcknowledged = postService.createPost(
                     request = request,
                     userId = call.userId,
-                    imageUrl = postPictureUrl
+                    imageBase64 = postImage ?: ""
                 )
                 if (createPostAcknowledged) {
                     call.respond(
@@ -61,7 +57,6 @@ fun Route.createPost(postService: PostService) {
                         )
                     )
                 } else {
-                    File("${Constants.POST_PICTURE_PATH}/$fileName").delete()
                     call.respond(HttpStatusCode.InternalServerError)
                 }
             } ?: kotlin.run {

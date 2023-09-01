@@ -51,7 +51,10 @@ class PostRepositoryImpl(
             .map {
                 it.followedUserId
             }
-        return posts.find(Post::userId `in` userIdsFromFollows)
+
+        val allUserIds = userIdsFromFollows + ownUserId
+        
+        return posts.find(Post::userId `in` allUserIds)
             .skip(page * pageSize)
             .limit(pageSize)
             .descendingSort(Post::timestamp)
@@ -64,11 +67,11 @@ class PostRepositoryImpl(
                 val user = users.findOneById(post.userId)
                 PostResponse(
                     id = post.id,
-                    userId = ownUserId,
+                    userId = post.userId,
                     username = user?.username ?: "",
-                    imageUrl = post.imageUrl,
+                    imageBase64 = post.imageBase64,
                     timestamp = post.timestamp,
-                    profilePictureUrl = user?.profileImageUrl ?: "",
+                    profilePictureBase64 = user?.profilePictureBase64 ?: "",
                     content = post.content,
                     likeCount = post.likeCount,
                     commentCount = post.commentCount,
@@ -100,9 +103,9 @@ class PostRepositoryImpl(
                     id = post.id,
                     userId = userId,
                     username = user.username,
-                    imageUrl = post.imageUrl,
+                    imageBase64 = post.imageBase64,
                     timestamp = post.timestamp,
-                    profilePictureUrl = user.profileImageUrl,
+                    profilePictureBase64 = user.profilePictureBase64,
                     content = post.content,
                     likeCount = post.likeCount,
                     commentCount = post.commentCount,
@@ -124,9 +127,9 @@ class PostRepositoryImpl(
             id = post.id,
             userId = user.id,
             username = user.username,
-            imageUrl = post.imageUrl,
+            imageBase64 = post.imageBase64,
             timestamp = post.timestamp,
-            profilePictureUrl = user.profileImageUrl,
+            profilePictureBase64 = user.profilePictureBase64,
             content = post.content,
             likeCount = post.likeCount,
             commentCount = post.commentCount,
